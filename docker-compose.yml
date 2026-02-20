@@ -1,21 +1,7 @@
-version: "3.8"
-
 services:
-    caddy:
-        image: caddy:latest
-        container_name: caddy
-        ports:
-            - "80:80"
-            - "443:443"
-        volumes:
-            - ./Caddyfile:/etc/caddy/Caddyfile
-            - ./caddy_data:/data
-            - ./caddy_config:/config
-        restart: unless-stopped
-
     typing-test:
-        build: .
+        image: "ghcr.io/stp-team/typing-test"
         container_name: typing-test
-        expose:
-            - "80"
+        ports:
+            - "127.0.0.1:2000:80"
         restart: unless-stopped

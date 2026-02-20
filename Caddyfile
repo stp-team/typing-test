@@ -1,3 +1,0 @@
-typing.dom-stp.ru {
-    reverse_proxy typing-test:80
-}
