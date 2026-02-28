@@ -42,28 +42,49 @@ export default function Result() {
             timeLimit,
         };
 
-        const json = JSON.stringify(resultData);
-        const base64 = btoa(json);
-
         try {
-            if (navigator.clipboard) {
-                await navigator.clipboard.writeText(base64);
-            } else {
-                // Fallback for older browsers or non-secure contexts
-                const textarea = document.createElement("textarea");
-                textarea.value = base64;
-                textarea.style.position = "fixed";
-                textarea.style.opacity = "0";
-                document.body.appendChild(textarea);
-                textarea.select();
-                const successful = document.execCommand("copy");
-                document.body.removeChild(textarea);
-                if (!successful) throw new Error("execCommand failed");
+            const json = JSON.stringify(resultData);
+            console.log("Result data:", resultData); // Debug logging
+
+            // Use TextEncoder to handle any potential Unicode characters properly
+            const encoder = new TextEncoder();
+            const data = encoder.encode(json);
+
+            // Convert to binary string for btoa
+            let binaryString = "";
+            data.forEach((byte) => {
+                binaryString += String.fromCharCode(byte);
+            });
+
+            const base64 = btoa(binaryString);
+            console.log("Base64 length:", base64.length); // Debug logging
+
+            try {
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(base64);
+                    console.log("Copied to clipboard successfully");
+                } else {
+                    // Fallback for older browsers or non-secure contexts
+                    const textarea = document.createElement("textarea");
+                    textarea.value = base64;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    const successful = document.execCommand("copy");
+                    document.body.removeChild(textarea);
+                    if (!successful) throw new Error("execCommand failed");
+                }
+                setCopySuccess(true);
+                setTimeout(() => setCopySuccess(false), 1000);
+            } catch (err) {
+                console.error("Failed to copy to clipboard:", err);
+                // Show error to user
+                alert("Failed to copy result. Please try again.");
             }
-            setCopySuccess(true);
-            setTimeout(() => setCopySuccess(false), 1000);
         } catch (err) {
-            console.error("Failed to copy:", err);
+            console.error("Failed to encode result:", err);
+            alert("Failed to encode result. Please try again.");
         }
     };
 
